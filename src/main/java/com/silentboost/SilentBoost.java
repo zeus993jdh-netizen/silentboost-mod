@@ -1,5 +1,6 @@
 package com.silentboost;
 
+import com.silentboost.optimization.chunk.ChunkOptimizer;
 import com.silentboost.optimization.entity.EntityTickOptimizer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -41,7 +42,7 @@ public final class SilentBoost implements ModInitializer {
 			safeInit("dictionary",   () -> { /* Крок 5: ItemDictionary.init();        */ });
 			safeInit("commands",     () -> { /* Крок 5/7: SbCommand.register();       */ });
 			safeInit("entityOpt",    () -> EntityTickOptimizer.init());
-			safeInit("chunkOpt",     () -> { /* Крок 3: ChunkOptimizer.init();        */ });
+			safeInit("chunkOpt",     () -> ChunkOptimizer.init());
 			safeInit("memoryOpt",    () -> { /* Крок 4: MemoryOptimizer.init();       */ });
 			safeInit("stats",        () -> { /* Крок 7: StatsCollector.init();        */ });
 		});
