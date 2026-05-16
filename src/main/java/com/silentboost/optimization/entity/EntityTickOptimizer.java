@@ -1,5 +1,6 @@
 package com.silentboost.optimization.entity;
 
+import com.silentboost.optimization.memory.MemoryOptimizer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.block.Block;
 import net.minecraft.block.DispenserBlock;
@@ -72,6 +73,19 @@ public final class EntityTickOptimizer {
 				cleanupCache();
 			}
 		});
+
+		// Памʼять: при тиску — додатково миттєво чистимо FARM_CACHE.
+		// Якщо MemoryOptimizer ще не активний, виклик буде no-op (з debug-логом).
+		MemoryOptimizer.registerCleaner("EntityTickOptimizer.FARM_CACHE",
+			EntityTickOptimizer::clearFarmCache);
+	}
+
+	/**
+	 * Публічний хук для MemoryOptimizer: миттєво очищує кеш ферм.
+	 * Безпечно — при наступному запиті кеш наповниться нормально.
+	 */
+	public static void clearFarmCache() {
+		FARM_CACHE.clear();
 	}
 
 	/**

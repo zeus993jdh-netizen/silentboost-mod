@@ -2,6 +2,7 @@ package com.silentboost;
 
 import com.silentboost.optimization.chunk.ChunkOptimizer;
 import com.silentboost.optimization.entity.EntityTickOptimizer;
+import com.silentboost.optimization.memory.MemoryOptimizer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -39,11 +40,12 @@ public final class SilentBoost implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
 			SERVER.set(server);
 			safeInit("config",       () -> { /* Крок 6: ConfigManager.load(server); */ });
+			// memoryOpt активуємо ПЕРШИМ — інші модулі реєструють у ньому cache-cleaners.
+			safeInit("memoryOpt",    () -> MemoryOptimizer.init());
 			safeInit("dictionary",   () -> { /* Крок 5: ItemDictionary.init();        */ });
 			safeInit("commands",     () -> { /* Крок 5/7: SbCommand.register();       */ });
 			safeInit("entityOpt",    () -> EntityTickOptimizer.init());
 			safeInit("chunkOpt",     () -> ChunkOptimizer.init());
-			safeInit("memoryOpt",    () -> { /* Крок 4: MemoryOptimizer.init();       */ });
 			safeInit("stats",        () -> { /* Крок 7: StatsCollector.init();        */ });
 		});
 
