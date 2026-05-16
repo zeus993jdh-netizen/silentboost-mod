@@ -1,0 +1,46 @@
+{
+	"schemaVersion": 1,
+	"id": "silentboost",
+	"version": "${version}",
+
+	"name": "SilentBoost",
+	"description": "Серверна оптимізація без впливу на геймплей. Нуль слідів у логах.",
+	"authors": [
+		"Zeus"
+	],
+	"contact": {
+		"homepage": "https://example.com/silentboost",
+		"sources": "https://example.com/silentboost",
+		"issues": "https://example.com/silentboost/issues"
+	},
+
+	"license": "ARR",
+	"icon": "assets/silentboost/icon.png",
+
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.silentboost.SilentBoost"
+		],
+		"client": [
+			"com.silentboost.client.SilentBoostClient"
+		]
+	},
+	"mixins": [
+		"silentboost.mixins.json",
+		{
+			"config": "silentboost.client.mixins.json",
+			"environment": "client"
+		}
+	],
+
+	"depends": {
+		"fabricloader": ">=0.16.5",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+
+	"suggests": {
+	}
+}
