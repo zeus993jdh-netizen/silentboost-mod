@@ -1,8 +1,11 @@
 package com.silentboost;
 
+import com.silentboost.command.SbCommand;
+import com.silentboost.config.ConfigManager;
 import com.silentboost.optimization.chunk.ChunkOptimizer;
 import com.silentboost.optimization.entity.EntityTickOptimizer;
 import com.silentboost.optimization.memory.MemoryOptimizer;
+import com.silentboost.stats.StatsCollector;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -36,17 +39,20 @@ public final class SilentBoost implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		// 1. Сервер стартує — підіймаємо підмодулі.
+		// 1. Команди реєструються до старту сервера — CommandRegistrationCallback
+		//    може спрацювати раніше за SERVER_STARTING, тож слухача чіпляємо тут.
+		safeInit("commands", SbCommand::register);
+
+		// 2. Сервер стартує — підіймаємо підмодулі. ConfigManager.load() МАЄ бути
+		//    перший, бо переписує volatile-поля інших модулів до їхнього init().
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
 			SERVER.set(server);
-			safeInit("config",       () -> { /* Крок 6: ConfigManager.load(server); */ });
-			// memoryOpt активуємо ПЕРШИМ — інші модулі реєструють у ньому cache-cleaners.
-			safeInit("memoryOpt",    () -> MemoryOptimizer.init());
-			safeInit("dictionary",   () -> { /* Крок 5: ItemDictionary.init();        */ });
-			safeInit("commands",     () -> { /* Крок 5/7: SbCommand.register();       */ });
-			safeInit("entityOpt",    () -> EntityTickOptimizer.init());
-			safeInit("chunkOpt",     () -> ChunkOptimizer.init());
-			safeInit("stats",        () -> { /* Крок 7: StatsCollector.init();        */ });
+			safeInit("config",    () -> ConfigManager.load());
+			// memoryOpt активуємо одразу після config — інші модулі реєструють у ньому cache-cleaners.
+			safeInit("memoryOpt", () -> MemoryOptimizer.init());
+			safeInit("stats",     () -> StatsCollector.init());
+			safeInit("entityOpt", () -> EntityTickOptimizer.init());
+			safeInit("chunkOpt",  () -> ChunkOptimizer.init());
 		});
 
 		// 2. Сервер тікає — гачок на випадок якщо потрібно щось централізоване.
